@@ -589,10 +589,11 @@ function BigDebuffs:OnEnable()
 
 	-- Prevent OmniCC finish animations
 	if OmniCC then
-		self:RawHook(OmniCC, "TriggerEffect", function(object, effectId, cooldown)
+		self:RawHook(OmniCC, "TriggerEffect", function(...)
+			local _, _, cooldown = ...
 			local name = cooldown.GetName and cooldown:GetName()
 			if name and name:find(addonName) then return end
-			self.hooks[OmniCC].TriggerEffect(object, effectId, cooldown)
+			self.hooks[OmniCC].TriggerEffect(...)
 		end, true)
 	end
 
