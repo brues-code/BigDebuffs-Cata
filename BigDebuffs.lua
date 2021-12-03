@@ -645,7 +645,7 @@ function BigDebuffs:UNIT_SPELLCAST_FAILED(_,unit, _, _, spellid)
 end
 
 function BigDebuffs:COMBAT_LOG_EVENT_UNFILTERED(_, ...)
-	local _, subEvent, sourceGUID, _, _, destGUID, destName, _, spellid, name = ...
+	local _, subEvent, _, sourceGUID, _, _, _, destGUID, destName, _, _, spellid, name = ...
 
 	if subEvent == "SPELL_CAST_SUCCESS" and self.Spells[spellid] then
 		if spellid == 2457 or spellid == 2458 or spellid == 71 then
