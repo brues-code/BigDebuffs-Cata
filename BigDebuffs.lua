@@ -2,8 +2,8 @@
 -- BigDebuffs by Jordon 
 -- Backported and general improvements by Konjunktur
 -- Spell list and minor improvements by Apparent
-
-BigDebuffs = LibStub("AceAddon-3.0"):NewAddon("BigDebuffs", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
+local addonName = ...
+BigDebuffs = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0", "AceConsole-3.0")
 
 -- Defaults
 local defaults = {
@@ -586,10 +586,10 @@ function BigDebuffs:OnEnable()
 
 	-- Prevent OmniCC finish animations
 	if OmniCC then
-		self:RawHook(OmniCC, "TriggerEffect", function(object, cooldown)
-			local name = cooldown:GetName()
-			if name and name:find("BigDebuffs") then return end
-			self.hooks[OmniCC].TriggerEffect(object, cooldown)
+		self:RawHook(OmniCC, "TriggerEffect", function(object, effectId, cooldown)
+			local name = cooldown.GetName and cooldown:GetName()
+			if name and name:find(addonName) then return end
+			self.hooks[OmniCC].TriggerEffect(object, effectId, cooldown)
 		end, true)
 	end
 
