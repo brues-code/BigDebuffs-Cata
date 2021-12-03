@@ -403,7 +403,10 @@ local anchors = {
 }
 
 function BigDebuffs:OnInitialize()
-	self.db = LibStub("AceDB-3.0"):New("BigDebuffsDB", defaults, true)
+	self.db = LibStub("AceDB-3.0"):New(addonName.."DB", defaults, true)
+	
+	self:RegisterChatCommand('bd', 'ParseParameters')
+	self:RegisterChatCommand(addonName, 'ParseParameters')
 
 	self.db.RegisterCallback(self, "OnProfileChanged", "Refresh")
 	self.db.RegisterCallback(self, "OnProfileCopied", "Refresh")
@@ -448,10 +451,10 @@ function BigDebuffs:AttachUnitFrame(unit)
 	end
 
 	local frame = self.UnitFrames[unit]
-	local frameName = "BigDebuffs" .. unit .. "UnitFrame"
+	local frameName = addonName .. unit .. "UnitFrame"
 
 	if not frame then
-		frame = CreateFrame("Button", frameName, UIParent, "BigDebuffsUnitFrameTemplate")
+		frame = CreateFrame("Button", frameName, UIParent, addonName.."UnitFrameTemplate")
 		frame.icon = _G[frameName.."Icon"]
 		frame.cooldownContainer = CreateFrame("Button", frameName.."CooldownContainer", frame)
 		self.UnitFrames[unit] = frame
@@ -899,8 +902,6 @@ function BigDebuffs:UNIT_PET()
 	self:UNIT_AURA(nil, "pet")
 end
 
-SLASH_BigDebuffs1 = "/bd"
-SLASH_BigDebuffs2 = "/bigdebuffs"
-SlashCmdList.BigDebuffs = function(msg)
-	LibStub("AceConfigDialog-3.0"):Open("BigDebuffs")
+function BigDebuffs:ParseParameters()
+	LibStub("AceConfigDialog-3.0"):Open(addonName)
 end
