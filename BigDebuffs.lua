@@ -94,21 +94,19 @@ BigDebuffs.Spells = {
 	[53312] = { type = "buffs_other", }, -- Nature's Grasp
 	[33357] = { type = "buffs_other", },  -- Dash
 	[768] = { type = "buffs_other", }, -- Cat Form
-	[9634] = { type = "buffs_other", }, -- Dire Bear Form
+	[5487] = { type = "buffs_other", }, -- Bear Form
 	[783] = { type = "buffs_other", }, -- Travel Form
 	[24858] = { type = "buffs_other", }, -- Moonkin Form
 	[33891] = { type = "buffs_other", }, -- Tree of Life
-	[49802] = { type = "cc" },  -- Maim
-	[8983] = { type = "cc", },  -- Bash
-	[18658] = {type = "cc"}, -- Hibernate
-		[2637] = {type = "cc"},
-		[18657] = {type = "cc"},
+	[22570] = { type = "cc" },  -- Maim
+	[5211] = { type = "cc", },  -- Bash
+	[2637] = {type = "cc"}, -- Hibernate
 	[49803] = { type = "cc", },  -- Pounce
 	[33786] = { type = "immunities" },  -- Cyclone
 	[45334] = { type = "roots", },  -- Feral Charge Effect (Immobilize)
 	[53308] = { type = "roots", },  -- Entangling Roots
 	[53313] = { type = "roots", }, -- Entangling Roots (From Nature's Grasp)
-	[19675] = { type = "interrupts", interruptduration = 4, },  -- Feral Charge Effect (Interrupt)
+	[45334] = { type = "interrupts", interruptduration = 4, },  -- Feral Charge Effect (Interrupt)
 	-- Hunter
 	[3045] = { type = "buffs_offensive", }, -- Rapid Fire
 	[53480] = { type = "buffs_defensive", },  -- Roar of Sacrifice (Hunter Pet Skill)
@@ -120,19 +118,17 @@ BigDebuffs.Spells = {
 	[34471] = { type = "immunities", },  -- The Beast Within
 	[19263] = { type = "immunities", },  -- Deterrence
 	[19574] = { type = "immunities", }, -- Bestial Wrath (Pet)
-	[3034] = { type = "buffs_other", },  -- Viper Sting
 	[24394] = { type = "cc", },  -- Intimidation (Stun)
 		[19577] = { type = "buffs_offensive", }, -- Intimidation (Pet Buff)
 	[49012] = { type = "cc", },  -- Wyvern Sting
 	[19503] = { type = "cc", },  -- Scatter Shot
-	[14309] = { type = "cc", },  -- Freezing Trap
-	[60210] = { type = "cc", }, -- Freezing Arrow Effect
+	[3355] = { type = "cc", },  -- Freezing Trap
 	[14327] = { type = "cc", }, -- Scare Beast
 	[53359] = { type = "cc", }, -- Chimera Shot - Scorpid (Disarm)
 	[53562] = { type = "cc", }, -- Ravage (Pet)
 	[53543] = { type = "cc", }, -- Snatch (Pet Disarm)
 	[34490] = { type = "cc", }, -- Silencing Shot
-	[48999] = { type = "roots", }, -- Counterattack
+	[19306] = { type = "roots", }, -- Counterattack
 	[19185] = { type = "roots", }, -- Entrapment
 		[64803] = { type = "roots", },
 		[64804] = { type = "roots", },
@@ -140,7 +136,7 @@ BigDebuffs.Spells = {
 	[4167] = { type = "roots", }, -- Web (Pet)
 	[26090] = { type = "interrupts", interruptduration = 2, }, -- Pummel (Pet)
 	-- Mage
-	[43039] = { type = "buffs_other", },  -- Ice Barrier
+	[11426] = { type = "buffs_other", },  -- Ice Barrier
 	[12472] = { type = "buffs_offensive", },  -- Icy Veins
 	[54748] = { type = "buffs_offensive", }, -- Burning Determination (Interrupt/Silence Immunity)
 	[12042] = { type = "buffs_offensive", },  -- Arcane Power
@@ -155,7 +151,7 @@ BigDebuffs.Spells = {
 		[28272] = { type = "cc", },
 		[61305] = { type = "cc", },
 		[61721] = { type = "cc", },
-	[42950] = { type = "cc", },  -- Dragon's Breath
+	[31661] = { type = "cc", },  -- Dragon's Breath
 	[44572] = { type = "cc", }, -- Deep Freeze
 	[12355] = { type = "cc", }, -- Impact
 	[55021] = { type = "cc", }, -- Improved Counterspell
@@ -168,9 +164,7 @@ BigDebuffs.Spells = {
 	[54428] = { type = "buffs_other", }, -- Divine Plea
 	[58597] = { type = "buffs_other", }, -- Sacred Shield Proc
 	[59578] = { type = "buffs_other", }, -- The Art of War
-	[10278] = { type = "buffs_defensive", },  -- Hand of Protection
-		[5599] = { type = "buffs_defensive", },
-		[1022] = { type = "buffs_defensive", },
+	[1022] = { type = "buffs_defensive", }, -- Hand of Protection
 	[31852] = { type = "buffs_defensive", },  -- Ardent Defender
 	[31821] = { type = "buffs_defensive", },  -- Aura Mastery
 	[498] = { type = "buffs_defensive", },  -- Divine Protection
@@ -179,7 +173,7 @@ BigDebuffs.Spells = {
 	[64205] = { type = "buffs_defensive", }, -- Divine Sacrifice
 	[31884] = { type = "buffs_offensive", },  -- Avenging Wrath
 	[20066] = { type = "cc", },  -- Repentance
-	[10308] = { type = "cc", },  -- Hammer of Justice
+	[853] = { type = "cc", },  -- Hammer of Justice
 	[63529] = { type = "cc", }, -- Silenced - Shield of the Templar
 	[10326] = { type = "cc", }, -- Turn Evil
 	[48817] = { type = "cc", }, -- Holy Wrath
@@ -201,7 +195,8 @@ BigDebuffs.Spells = {
 	[10890] = { type = "cc", },  -- Psychic Scream
 	[15487] = { type = "cc", },  -- Silence
 	[605] = { type = "cc", },  -- Mind Control
-	[10955] = { type = "cc", },  -- Shackle Undead
+	[9484] = { type = "cc", },  -- Shackle Undead
+	[96231] = { type = "interrupts", interruptduration = 4 }, -- Rebuke
 	-- Rogue
 	[51713] = { type = "buffs_offensive", }, -- Shadow Dance
 	[13750] = { type = "buffs_offensive", },  -- Adrenaline Rush
@@ -213,7 +208,7 @@ BigDebuffs.Spells = {
 	[51722] = {type = "cc", }, -- Dismantle
 	[2094] = { type = "cc", },  -- Blind
 	[8643] = { type = "cc", },  -- Kidney Shot
-	[51724] = { type = "cc", },  -- Sap
+	[6770] = { type = "cc", },  -- Sap
 	[1330] = { type = "cc", },  -- Garrote - Silence
 	[1833] = { type = "cc", },  -- Cheap Shot
 	[18425] = { type = "cc", }, -- Silence (Improved Kick)
@@ -241,7 +236,7 @@ BigDebuffs.Spells = {
 	[47986] = { type = "buffs_other", }, -- Sacrifice
 	[60995] = { type = "cc", }, -- Demon Charge (Metamorphosis)
 	[47847] = { type = "cc", },  -- Shadowfury
-		[30283] = { type = "cc", },
+	[30283] = { type = "cc", },
 	[31117] = { type = "cc", },  -- Unstable Affliction (Silence)
 	[18647] = { type = "cc", },  -- Banish
 	[47860] = { type = "cc", },  -- Death Coil
@@ -249,7 +244,7 @@ BigDebuffs.Spells = {
 	[6215] = { type = "cc", },  -- Fear
 	[17928] = { type = "cc", },  -- Howl of Terror
 	[24259] = { type = "cc", }, -- Spell Lock (Silence)
-	[47995] = { type = "cc", }, -- Intercept (Felguard)
+	[89766] = { type = "cc", }, -- Axe Toss (Felguard)
 	[19647] = { type = "interrupts", interruptduration = 6, },  -- Spell Lock (Interrupt)
 	-- Warrior
 	[12975] = { type = "buffs_defensive", },  -- Last Stand
@@ -259,8 +254,7 @@ BigDebuffs.Spells = {
 	[2565] = { type = "buffs_defensive", }, -- Shield Block
 	[20230] = { type = "buffs_defensive", }, -- Retaliation
 	[60503] = { type = "buffs_offensive", }, -- Taste for Blood
-	[64849] = { type = "buffs_offensive", }, -- Unrelenting Assault (1/2)
-	[65925] = { type = "buffs_offensive", }, -- Unrelenting Assault (2/2)
+	[65925] = { type = "buffs_offensive", }, -- Unrelenting Assault
 	[1719] = { type = "buffs_offensive", },  -- Recklessness
 	[12292] = { type = "buffs_offensive", }, -- Death Wish
 	[18499] = { type = "buffs_other", },  -- Berserker Rage
@@ -279,7 +273,6 @@ BigDebuffs.Spells = {
 	[46924] = { type = "immunities", },  -- Bladestorm
 	[23920] = { type = "immunities_spells", },  -- Spell Reflection
 	[6552] = { type = "interrupts", interruptduration = 4, },  -- Pummel
-	[72] = { type = "interrupts", interruptduration = 5, }, -- Shield Bash
 	-- Misc
 	[43183] = { type = "buffs_other", },  -- Drink (Arena/Lvl 80 Water)
 		[57073] = { type = "buffs_other" }, -- (Mage Water)
@@ -287,6 +280,8 @@ BigDebuffs.Spells = {
 	[28730] = { type = "cc", }, -- Arcane Torrent (Mana)
 	[25046] = { type = "cc", }, -- Arcane Torrent (Energy)
 	[50613] = { type = "cc", }, -- Arcane Torrent (Runic Power)
+	[69179] = { type = "cc", }, -- Arcane Torrent (Rage)
+	[80483] = { type = "cc", }, -- Arcane Torrent (Focus)
 }
 
 local units = {
