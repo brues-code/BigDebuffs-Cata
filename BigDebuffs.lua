@@ -643,7 +643,7 @@ function BigDebuffs:UNIT_SPELLCAST_FAILED(_,unit, _, _, spellid)
 	if self.interrupts[guid] == nil then
 		self.interrupts[guid] = {}
 		BigDebuffs:CancelTimer(self.interrupts[guid].timer)
-		self.interrupts[guid].timer = BigDebuffs:ScheduleTimer(self.ClearInterruptGUID, 30, self, guid)
+		self.interrupts[guid].timer = self:ScheduleTimer(function(...)self:ClearInterruptGUID(...)end, 30, guid)
 	end
 	self.interrupts[guid].failed = GetTime()
 end
@@ -687,7 +687,7 @@ function BigDebuffs:UpdateStance(guid, spellid)
 	end
 	
 	self.stances[guid].stance = spellid
-	self.stances[guid].timer = self:ScheduleTimer(self.ClearStanceGUID, 180, self, guid)
+	self.stances[guid].timer = self:ScheduleTimer(function(...)self:ClearStanceGUID(...)end, 180, guid)
 
 	local unit = self:GetUnitFromGUID(guid)
 	if unit then
@@ -700,7 +700,7 @@ function BigDebuffs:ClearStanceGUID(guid)
 	if unit == nil then
 		self.stances[guid] = nil
 	else
-		self.stances[guid].timer = BigDebuffs:ScheduleTimer(self.ClearStanceGUID, 180, self, guid)
+		self.stances[guid].timer = self:ScheduleTimer(function(...)self:ClearStanceGUID(...)end, 180, guid)
 	end
 end
 
@@ -710,7 +710,7 @@ function BigDebuffs:UpdateInterrupt(unit, guid, spellid, duration)
 	if spellid and duration ~= nil then
 		if self.interrupts[guid] == nil then self.interrupts[guid] = {} end
 		BigDebuffs:CancelTimer(self.interrupts[guid].timer)
-		self.interrupts[guid].timer = BigDebuffs:ScheduleTimer(self.ClearInterruptGUID, 30, self, guid)
+		self.interrupts[guid].timer = BigDebuffs:ScheduleTimer(function(...)self:ClearInterruptGUID(...)end, 30, guid)
 		self.interrupts[guid][spellid] = {started = t, duration = duration}
 	-- old interrupt expiring
 	elseif spellid and duration == nil then
@@ -729,7 +729,7 @@ function BigDebuffs:UpdateInterrupt(unit, guid, spellid, duration)
 	end
 	-- clears the interrupt after end of duration
 	if duration then
-		BigDebuffs:ScheduleTimer(self.UpdateInterrupt, duration+0.1, self, unit, guid, spellid)
+		self:ScheduleTimer(function(arg1) self:UpdateInterrupt(unpack(arg1)) end, duration+0.1, {unit, guid, spellid})
 	end
 end
 
