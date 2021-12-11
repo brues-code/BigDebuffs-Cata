@@ -124,7 +124,7 @@ BigDebuffs.Spells = {
 	[19503] = { type = "cc", },  -- Scatter Shot
 	[3355] = { type = "cc", },  -- Freezing Trap
 	[14327] = { type = "cc", }, -- Scare Beast
-	[53359] = { type = "cc", }, -- Chimera Shot - Scorpid (Disarm)
+	[35101] = { type = "cc", }, -- Chimera Shot - Daze
 	[53562] = { type = "cc", }, -- Ravage (Pet)
 	[53543] = { type = "cc", }, -- Snatch (Pet Disarm)
 	[34490] = { type = "cc", }, -- Silencing Shot
@@ -162,7 +162,7 @@ BigDebuffs.Spells = {
 	[2139] = { type = "interrupts", interruptduration = 6, },  -- Counterspell (Mage)
 	-- Paladin
 	[54428] = { type = "buffs_other", }, -- Divine Plea
-	[58597] = { type = "buffs_other", }, -- Sacred Shield Proc
+	[96263] = { type = "buffs_other", }, -- Sacred Shield Proc
 	[59578] = { type = "buffs_other", }, -- The Art of War
 	[1022] = { type = "buffs_defensive", }, -- Hand of Protection
 	[31852] = { type = "buffs_defensive", },  -- Ardent Defender
@@ -176,7 +176,7 @@ BigDebuffs.Spells = {
 	[853] = { type = "cc", },  -- Hammer of Justice
 	[63529] = { type = "cc", }, -- Silenced - Shield of the Templar
 	[10326] = { type = "cc", }, -- Turn Evil
-	[48817] = { type = "cc", }, -- Holy Wrath
+	[2812] = { type = "cc", }, -- Holy Wrath
 	[20170] = { type = "cc", }, -- Seal of Justice Stun
 	[642] = { type = "immunities", },  -- Divine Shield
 	-- Priest
@@ -283,6 +283,14 @@ BigDebuffs.Spells = {
 	[69179] = { type = "cc", }, -- Arcane Torrent (Rage)
 	[80483] = { type = "cc", }, -- Arcane Torrent (Focus)
 }
+
+function BigDebuffs_SpellTest()
+	for k,v in pairs(BigDebuffs.Spells) do
+		if not GetSpellInfo(k) then
+			print(k)
+		end
+	end
+end
 
 local units = {
 	"player",
