@@ -821,21 +821,9 @@ end
             BigDebuffs:CancelTimer(ReapSchedulers[guid]);
         end
 
-        if GetTime() - corpse.lastMove > self.db.global.HFT or force then
-
-            -- remove the scheduler id that brought us here
-            ReapSchedulers[guid]                            = nil;
-            -- clean the mess
-            Private_registry_by_GUID[isFriend][guid]        = nil;
-            Private_registry_by_Name[isFriend][corpse.name] = nil;
-
-            -- announce the (un)timely departure of this healer and expose the corpse for all to see
-            self:SendMessage("BigDebuffs_HEALER_GONE", isFriend, corpse);
-            self:Debug(INFO2, corpse.name, "reaped");
-        else
-            ApointReaper(guid, isFriend, (GetTime() - corpse.lastMove) + 1);
-            self:Debug(INFO2, corpse.name, "is still kicking");
-        end
+		-- announce the (un)timely departure of this healer and expose the corpse for all to see
+		self:SendMessage("BigDebuffs_HEALER_GONE", isFriend, corpse);
+		self:Debug(INFO2, corpse.name, "reaped");
     end
 
     
@@ -843,7 +831,7 @@ end
     -- Neatly add them to our little registry and keep an eye on them
     local record, name;
     local function RegisterHealer (time, unitInfo, configRef) -- {{{
-		local isFriend, guid, sourceName, isHuman, spellName, icon, start, duration = unpack(unitInfo)
+		local isFriend, guid, sourceName, isHuman, spellName, icon, start, finish, duration = unpack(unitInfo)
 
         -- this is a new one, let's create a birth certificate
         if not Private_registry_by_GUID[isFriend][guid] then
@@ -880,8 +868,7 @@ end
 
             Private_registry_by_GUID[isFriend][guid] = record;
             Private_registry_by_Name[isFriend][name] = record;
-
-            ApointReaper(guid, isFriend, 0);
+            ApointReaper(guid, isFriend, finish);
 
         else
             -- fetch the existing record
@@ -1168,28 +1155,32 @@ function BigDebuffs:UNIT_AURA(event, unit)
 				frame.icon:SetTexture(icon)
 			end
 		end
+
+		local isFriend = UnitIsFriend("player",unit) == true
 		
 		if duration >= 1 then
 			frame.cooldown:SetCooldown(expires - duration, duration)
 			frame.cooldownContainer:Show()
+			local unitInfo = {
+				isFriend,
+				guid,
+				UnitName(unit),
+				UnitIsPlayer(guid), 
+				n,
+				icon,
+				expires - duration,
+				expires-GetTime(),
+				duration
+			}
+			RegisterHealer(now, unitInfo, {})
 		else 
 			frame.cooldown:SetCooldown(0, 0)
 			frame.cooldownContainer:Hide()
+			self:Reap(guid, isFriend, true)
 		end
 
 		frame:Show()
 		frame.current = icon
-		local unitInfo = {
-			UnitIsFriend("player",unit) == true,
-			guid,
-			UnitName(unit),
-			UnitIsPlayer(guid), 
-			n,
-			icon,
-			expires - duration,
-			duration
-		}
-		RegisterHealer(now, unitInfo, {})
 	else
 		-- Adapt
 		if frame.anchor and frame.blizzard and Adapt and Adapt.portraits[frame.anchor] then

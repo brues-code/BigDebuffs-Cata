@@ -351,7 +351,7 @@ function NPH:LibNameplate_NewNameplate(selfevent, plate)
             return;
         end
 
-        self:AddCrossToPlate(plate, isFriend, plateName);
+        --self:AddCrossToPlate(plate, isFriend, plateName);
     end
 end
 
@@ -409,7 +409,7 @@ do
     end
 
     local function MakeTexture() -- ONCE
-        local container = CreateFrame("FRAME", Plate:GetName().."container", Plate)
+        local container = CreateFrame("FRAME", PlateName.."container", Plate)
         SetTextureParams(container)
         local t = container:CreateTexture();
         SetTextureParams(t);
@@ -489,7 +489,7 @@ do
             plate[PLATES__NPH_NAMES[isFriend]].isFriend = isFriend;
 
             PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
-
+            print('hi',plateName)
             AddElements();
 
         elseif not PlateAdditions.IsShown then
