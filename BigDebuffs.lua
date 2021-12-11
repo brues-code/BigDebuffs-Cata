@@ -309,6 +309,7 @@ local units = {
 	"pet",
 	"target",
 	"focus",
+	"mouseover",
 	"party1",
 	"party2",
 	"party3",
@@ -441,26 +442,26 @@ BigDebuffs:SetDefaultModulePrototype( {
 
 
 BigDebuffs.Registry_by_GUID = {
-    [true] = {}, -- [guid] = healer_template
-    [false] = {}, -- [guid] = healer_template
+    [true] = {}, -- [guid] = unitInfo_template
+    [false] = {}, -- [guid] = unitInfo_template
 }
 
 BigDebuffs.Registry_by_Name = {
-    [true] = {}, -- [name] = healer_template
-    [false] = {}, -- [name] = healer_template
+    [true] = {}, -- [name] = unitInfo_template
+    [false] = {}, -- [name] = unitInfo_template
 }
 
-function BigDebuffs:BigDebuffs_HEALER_GONE(selfevent, isFriend, healer)
-    self.Registry_by_GUID[isFriend][healer.guid]        = nil;
-    self.Registry_by_Name[isFriend][healer.name]        = nil;
+function BigDebuffs:BigDebuffs_UNIT_GONE(selfevent, isFriend, unitInfo)
+    self.Registry_by_GUID[isFriend][unitInfo.guid]        = nil;
+    self.Registry_by_Name[isFriend][unitInfo.name]        = nil;
 
     -- test if there are others with the same name... *sigh* this sucks
-    for guid, healerRecord in pairs (self.Registry_by_GUID[isFriend]) do
+    for guid, unitInfoRecord in pairs (self.Registry_by_GUID[isFriend]) do
 
-        if healerRecord.name == healer.name then
-            self.Registry_by_Name[isFriend][healer.name] = healerRecord;
+        if unitInfoRecord.name == unitInfo.name then
+            self.Registry_by_Name[isFriend][unitInfo.name] = unitInfoRecord;
 
-            self:Debug(INFO, "replaced record for", healer.name);
+            self:Debug(INFO, "replaced record for", unitInfo.name);
 
             break;
         end
@@ -474,12 +475,12 @@ local UnitInParty               = _G.UnitInParty;
 local UnitSetRole               = _G.UnitSetRole;
 local UnitGroupRolesAssigned    = _G.UnitGroupRolesAssigned;
 
-function BigDebuffs:BigDebuffs_HEALER_BORN(selfevent, isFriend, healer)
+function BigDebuffs:BigDebuffs_UNIT_BORN(selfevent, isFriend, unitInfo)
 
-    self:Debug(INFO, "BigDebuffs:BigDebuffs_HEALER_BORN()");
+    self:Debug(INFO, "BigDebuffs:BigDebuffs_UNIT_BORN()");
 
-    BigDebuffs.Registry_by_GUID[isFriend][healer.guid] = healer;
-    BigDebuffs.Registry_by_Name[isFriend][healer.name] = healer;
+    BigDebuffs.Registry_by_GUID[isFriend][unitInfo.guid] = unitInfo;
+    BigDebuffs.Registry_by_Name[isFriend][unitInfo.name] = unitInfo;
 
 end
 
@@ -670,8 +671,8 @@ function BigDebuffs:OnEnable()
 
 	
     -- Subscribe to our own callbacks
-    self:RegisterMessage("BigDebuffs_HEALER_GONE");
-    self:RegisterMessage("BigDebuffs_HEALER_BORN");
+    self:RegisterMessage("BigDebuffs_UNIT_GONE");
+    self:RegisterMessage("BigDebuffs_UNIT_BORN");
 
 
 	self.interrupts = {}
@@ -754,42 +755,14 @@ end
     local ReapSchedulers = {};
 
     local Private_registry_by_GUID = {
-        [true] = {}, -- [guid] = healer_template
-        [false] = {}, -- [guid] = healer_template
+        [true] = {}, -- [guid] = unitInfo_template
+        [false] = {}, -- [guid] = unitInfo_template
     }
 
     local Private_registry_by_Name = {
-        [true] = {}, -- [name] = healer_template
-        [false] = {}, -- [name] = healer_template
+        [true] = {}, -- [name] = unitInfo_template
+        [false] = {}, -- [name] = unitInfo_template
     }
-
-    local HealerPool;
-    local function sortHealerCallBack(a, b)
-        if HealerPool[a].healDone > HealerPool[b].healDone then
-            return true;
-        else
-            return false;
-        end
-    end
-
-    local SortingTray = {};
-
-    local function UpdateRanks(healerPool)
-
-        HealerPool = healerPool;
-
-        TableWipe(SortingTray);
-
-        for guid in pairs (healerPool) do
-            SortingTray[#SortingTray + 1] = guid;
-        end
-
-        TableSort(SortingTray, sortHealerCallBack);
-
-        for i, guid in ipairs (SortingTray) do
-            healerPool[guid].rank = i;
-        end
-    end
 
 
     local ReapFriend = {
@@ -821,8 +794,8 @@ end
             BigDebuffs:CancelTimer(ReapSchedulers[guid]);
         end
 
-		-- announce the (un)timely departure of this healer and expose the corpse for all to see
-		self:SendMessage("BigDebuffs_HEALER_GONE", isFriend, corpse);
+		-- announce the (un)timely departure of this unitInfo and expose the corpse for all to see
+		self:SendMessage("BigDebuffs_UNIT_GONE", isFriend, corpse);
 		self:Debug(INFO2, corpse.name, "reaped");
     end
 
@@ -831,7 +804,7 @@ end
     -- Neatly add them to our little registry and keep an eye on them
     local record, name;
     local function RegisterHealer (time, unitInfo, configRef) -- {{{
-		local isFriend, guid, sourceName, isHuman, spellName, icon, start, finish, duration = unpack(unitInfo)
+		local isFriend, guid, sourceName, isHuman, spellName, icon, expires, duration = unpack(unitInfo)
 
         -- this is a new one, let's create a birth certificate
         if not Private_registry_by_GUID[isFriend][guid] then
@@ -840,7 +813,7 @@ end
                 name = str_match(sourceName, "^[^-]+");
             else
                 -- XXX fatal error out
-                BigDebuffs:Debug(WARNING, "RegisterHealer(): sourceName is missing and healer is new", guid);
+                BigDebuffs:Debug(WARNING, "RegisterHealer(): sourceName is missing and unitInfo is new", guid);
                 return;
             end
 
@@ -859,7 +832,7 @@ end
                 fullName    = sourceName,
                 isUnique    = isUnique,
                 isHuman     = isHuman,
-				start		= start,
+				start		= expires-duration,
 				duration	= duration,
                 rank        = -1, -- updated later
                 _lastSort   =  0, -- updated later
@@ -868,7 +841,7 @@ end
 
             Private_registry_by_GUID[isFriend][guid] = record;
             Private_registry_by_Name[isFriend][name] = record;
-            ApointReaper(guid, isFriend, finish);
+            ApointReaper(guid, isFriend, expires-GetTime());
 
         else
             -- fetch the existing record
@@ -879,7 +852,7 @@ end
 
         if configRef.Log then -- {{{
             -- also log and keep track of used spells here if option is set
-            -- keep in mind that logging can be enabled once a healer has already been registered
+            -- keep in mind that logging can be enabled once a unitInfo has already been registered
             local log;
 
             if not BigDebuffs.LOGS[isFriend][guid] then
@@ -887,7 +860,6 @@ end
                     guid        = guid,
                     name        = name,
                     spells      = {},
-                    healDone    = 0,
                     isFriend    = isFriend,
                     isHuman     = isHuman,
 					icon		= icon,
@@ -911,16 +883,13 @@ end
 
             record._lastSort = time;
 
-            -- update the ranks of this healer's side, good or evil
-            UpdateRanks(Private_registry_by_GUID[isFriend]);
-
             if not BigDebuffs.Registry_by_GUID[isFriend][guid] then
                 -- Dispatch the news
                 BigDebuffs:Debug(INFO, "Healer detected:", sourceName);
-                BigDebuffs:SendMessage("BigDebuffs_HEALER_BORN", isFriend, record);
+                BigDebuffs:SendMessage("BigDebuffs_UNIT_BORN", isFriend, record);
             end
 
-            BigDebuffs:SendMessage("BigDebuffs_HEALER_GROW", isFriend, record);
+            BigDebuffs:SendMessage("BigDebuffs_UNIT_GROW", isFriend, record);
         end
 
     end -- }}}
@@ -1168,8 +1137,7 @@ function BigDebuffs:UNIT_AURA(event, unit)
 				UnitIsPlayer(guid), 
 				n,
 				icon,
-				expires - duration,
-				expires-GetTime(),
+				expires,
 				duration
 			}
 			RegisterHealer(now, unitInfo, {})

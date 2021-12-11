@@ -8,7 +8,7 @@ Version 2.0.0
 This is a very simple and light add-on that rings when you hover or target a
 unit of the opposite faction who healed someone during the last 60 seconds (can
 be configured).
-Now you can spot those nasty healers instantly and help them to accomplish their destiny!
+Now you can spot those nasty unitInfos instantly and help them to accomplish their destiny!
 
 This add-on uses the Ace3 framework.
 
@@ -18,7 +18,7 @@ type /BigDebuffs to get a list of existing options.
     NamePlateHooker.lua
 -----
 
-This component hooks the name plates above characters and adds a sign on top to identifie them as healers
+This component hooks the name plates above characters and adds a sign on top to identifie them as unitInfos
 
 
 --]=]
@@ -174,9 +174,9 @@ function NPH:OnEnable() -- {{{
     LNP.RegisterCallback(self, "LibNameplate_FoundGUID");
     
     -- Subscribe to BigDebuffs callbacks
-    self:RegisterMessage("BigDebuffs_HEALER_GONE");
-    self:RegisterMessage("BigDebuffs_HEALER_BORN");
-    self:RegisterMessage("BigDebuffs_HEALER_GROW");
+    self:RegisterMessage("BigDebuffs_UNIT_GONE");
+    self:RegisterMessage("BigDebuffs_UNIT_BORN");
+    self:RegisterMessage("BigDebuffs_UNIT_GROW");
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
 
@@ -201,26 +201,26 @@ end -- }}}
 
 
 NPH.DisplayedPlates_byFrameTID = { -- used for updating plates dipslay attributes
-    [true] = {}, -- for Friendly healers
-    [false] = {} -- for enemy healers
+    [true] = {}, -- for Friendly unitInfos
+    [false] = {} -- for enemy unitInfos
 };
 
 local Plate_Name_Count = { -- array by name so we have to make the difference between friends and foes
-    [true] = {}, -- for Friendly healers
-    [false] = {} -- for enemy healers
+    [true] = {}, -- for Friendly unitInfos
+    [false] = {} -- for enemy unitInfos
 };
 local NP_Is_Not_Unique = { -- array by name so we have to make the difference between friends and foes
-    [true] = {}, -- for Friendly healers
-    [false] = {} -- for enemy healers
+    [true] = {}, -- for Friendly unitInfos
+    [false] = {} -- for enemy unitInfos
 };
 
 local Multi_Plates_byName = {
-    [true] = {}, -- for Friendly healers
-    [false] = {} -- for enemy healers
+    [true] = {}, -- for Friendly unitInfos
+    [false] = {} -- for enemy unitInfos
 };
 
 function NPH:PLAYER_ENTERING_WORLD() -- {{{
-    self:Debug(INFO2, "Cleaning multi instanced healers data");
+    self:Debug(INFO2, "Cleaning multi instanced unitInfos data");
     Plate_Name_Count[true] = {};
     Plate_Name_Count[false] = {};
     NP_Is_Not_Unique[true] = {};
@@ -232,19 +232,19 @@ end
 
 -- }}}
 
--- Internal CallBacks (BigDebuffs_HEALER_GONE -- BigDebuffs_HEALER_BORN -- ON_HEALER_PLATE_TOUCH -- BigDebuffs_MOUSE_OVER_OR_TARGET) {{{
-function NPH:BigDebuffs_HEALER_GONE(selfevent, isFriend, healer)
-    self:Debug(INFO2, "NPH:BigDebuffs_HEALER_GONE", healer.name, healer.guid, isFriend);
+-- Internal CallBacks (BigDebuffs_UNIT_GONE -- BigDebuffs_UNIT_BORN -- ON_UNIT_PLATE_TOUCH -- BigDebuffs_MOUSE_OVER_OR_TARGET) {{{
+function NPH:BigDebuffs_UNIT_GONE(selfevent, isFriend, unitInfo)
+    self:Debug(INFO2, "NPH:BigDebuffs_UNIT_GONE", unitInfo.name, unitInfo.guid, isFriend);
 
     if not isFriend and not GetCVarBool("nameplateShowEnemies") or isFriend and not GetCVarBool("nameplateShowFriends") then
-        self:Debug(INFO2, "NPH:BigDebuffs_HEALER_GONE(): bad state, nameplates disabled",  healer.name, healer.guid, isFriend);
+        self:Debug(INFO2, "NPH:BigDebuffs_UNIT_GONE(): bad state, nameplates disabled",  unitInfo.name, unitInfo.guid, isFriend);
         return;
     end
 
-    local plateByName = LNP:GetNameplateByName(healer.name);
+    local plateByName = LNP:GetNameplateByName(unitInfo.name);
     local plateByGuid;
     if self.db.global.sPve then
-        plateByGuid = LNP:GetNameplateByGUID(healer.guid);
+        plateByGuid = LNP:GetNameplateByGUID(unitInfo.guid);
     end
 
     local plate = plateByGuid or plateByName;
@@ -253,37 +253,37 @@ function NPH:BigDebuffs_HEALER_GONE(selfevent, isFriend, healer)
     if plate then
 
         -- if we can acces to the plate using its guid or if it's unique
-        if plateByGuid or not NP_Is_Not_Unique[isFriend][healer.name] then
-            --self:Debug("Must drop", healer.name);
-            self:HideCrossFromPlate(plate, isFriend, healer.name);
+        if plateByGuid or not NP_Is_Not_Unique[isFriend][unitInfo.name] then
+            --self:Debug("Must drop", unitInfo.name);
+            self:HideCrossFromPlate(plate, isFriend, unitInfo.name);
 
-        elseif not self.db.global.sPve and not BigDebuffs.Registry_by_Name[isFriend][healer.name] then -- Just hide all the symbols on the plates with that name if there is none left
+        elseif not self.db.global.sPve and not BigDebuffs.Registry_by_Name[isFriend][unitInfo.name] then -- Just hide all the symbols on the plates with that name if there is none left
 
-            for plate, plate in pairs (Multi_Plates_byName[isFriend][healer.name]) do
-                self:HideCrossFromPlate(plate, isFriend, healer.name);
+            for plate, plate in pairs (Multi_Plates_byName[isFriend][unitInfo.name]) do
+                self:HideCrossFromPlate(plate, isFriend, unitInfo.name);
             end
         end
     else
-        self:Debug(INFO2, "BigDebuffs_HEALER_GONE: no plate for", healer.name);
+        self:Debug(INFO2, "BigDebuffs_UNIT_GONE: no plate for", unitInfo.name);
     end
 end
 
-function NPH:BigDebuffs_HEALER_GROW (selfevent, isFriend, healer)
+function NPH:BigDebuffs_UNIT_GROW (selfevent, isFriend, unitInfo)
     --self:Debug(INFO, 'Updating displayed ranks');
     --self:UpdateRanks();
 end
 
-function NPH:BigDebuffs_HEALER_BORN (selfevent, isFriend, healer)
+function NPH:BigDebuffs_UNIT_BORN (selfevent, isFriend, unitInfo)
 
     if not isFriend and not GetCVarBool("nameplateShowEnemies") or isFriend and not GetCVarBool("nameplateShowFriends") then
         return;
     end
 
 
-    local plateByName = LNP:GetNameplateByName(healer.name);
+    local plateByName = LNP:GetNameplateByName(unitInfo.name);
     local plateByGuid;
     if self.db.global.sPve then
-        plateByGuid = LNP:GetNameplateByGUID(healer.guid);
+        plateByGuid = LNP:GetNameplateByGUID(unitInfo.guid);
     end
 
     local plate = plateByGuid or plateByName;
@@ -292,25 +292,25 @@ function NPH:BigDebuffs_HEALER_BORN (selfevent, isFriend, healer)
 
     if plate then
         -- we have have access to the correct plate through the unit's GUID or it's uniquely named.
-        if plateByGuid or not NP_Is_Not_Unique[isFriend][healer.name] then
-            self:AddCrossToPlate (plate, isFriend, healer.name, healer.guid, healer.icon, healer.start, healer.duration);
+        if plateByGuid or not NP_Is_Not_Unique[isFriend][unitInfo.name] then
+            self:AddCrossToPlate (plate, isFriend, unitInfo.name, unitInfo.guid, unitInfo.icon, unitInfo.start, unitInfo.duration);
 
-            self:Debug(INFO, "BigDebuffs_HEALER_BORN(): GUID available or unique", NP_Is_Not_Unique[isFriend][healer.name]);
-            self:Debug(WARNING, healer.name, NP_Is_Not_Unique[isFriend][healer.name]);
+            self:Debug(INFO, "BigDebuffs_UNIT_BORN(): GUID available or unique", NP_Is_Not_Unique[isFriend][unitInfo.name]);
+            self:Debug(WARNING, unitInfo.name, NP_Is_Not_Unique[isFriend][unitInfo.name]);
 
         elseif not self.db.global.sPve then -- we can only access through its name and we are not in strict pve mode -- when multi pop, it will add the cross to all plates
 
-            for plate, plate in pairs (Multi_Plates_byName[isFriend][healer.name]) do
-                self:AddCrossToPlate (plate, isFriend, healer.name, nil, healer.icon, healer.start, healer.duration);
+            for plate, plate in pairs (Multi_Plates_byName[isFriend][unitInfo.name]) do
+                self:AddCrossToPlate (plate, isFriend, unitInfo.name, nil, unitInfo.icon, unitInfo.start, unitInfo.duration);
 
-                self:Debug(INFO, "BigDebuffs_HEALER_BORN(): Using name only", healer.name);
+                self:Debug(INFO, "BigDebuffs_UNIT_BORN(): Using name only", unitInfo.name);
             end
         else
-            self:Debug(WARNING, "BigDebuffs_HEALER_BORN: multi and sPVE and noguid :'( ", healer.name);
+            self:Debug(WARNING, "BigDebuffs_UNIT_BORN: multi and sPVE and noguid :'( ", unitInfo.name);
         end
     else
         -- if spve we won't do anything since thee is no way to know the right plate.
-        self:Debug(WARNING, "BigDebuffs_HEALER_BORN: no plate for ", healer.name);
+        self:Debug(WARNING, "BigDebuffs_UNIT_BORN: no plate for ", unitInfo.name);
         return;
     end
 end
