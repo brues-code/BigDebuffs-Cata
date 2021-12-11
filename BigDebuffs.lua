@@ -2,8 +2,10 @@
 -- BigDebuffs by Jordon 
 -- Backported and general improvements by Konjunktur
 -- Spell list and minor improvements by Apparent
-local addonName = ...
+local addonName, T = ...
 BigDebuffs = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0", "AceConsole-3.0")
+_G.BigDebuffs = BigDebuffs
+T.BigDebuffs = BigDebuffs
 
 -- Defaults
 local defaults = {
@@ -69,6 +71,9 @@ local defaults = {
 		spells = {},
 	}
 }
+
+BigDebuffs.Constants = {};
+local BigDebuffs_C = BigDebuffs.Constants;
 
 BigDebuffs.Spells = {
 	-- Death Knight
@@ -404,6 +409,40 @@ local anchors = {
 		},
 	},
 }
+
+
+-- Modules standards configurations {{{
+
+-- Configure default libraries for modules
+BigDebuffs:SetDefaultModuleLibraries( "AceConsole-3.0", "AceEvent-3.0")
+
+-- Set the default prototype for modules
+BigDebuffs:SetDefaultModulePrototype( {
+    OnEnable = function(self) self:Debug(INFO, "prototype OnEnable called!") end,
+
+    OnDisable = function(self) self:Debug(INFO, "prototype OnDisable called!") end,
+
+    OnInitialize = function(self)
+        self:Debug(INFO, "prototype OnInitialize called!");
+    end,
+
+    Debug = function(self, ...) BigDebuffs.Debug(self, ...) end,
+
+    Error = function(self, m) BigDebuffs.Error (self, m) end,
+
+} )
+
+
+BigDebuffs.Registry_by_GUID = {
+    [true] = {}, -- [guid] = healer_template
+    [false] = {}, -- [guid] = healer_template
+}
+
+BigDebuffs.Registry_by_Name = {
+    [true] = {}, -- [name] = healer_template
+    [false] = {}, -- [name] = healer_template
+}
+
 
 function BigDebuffs:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New(addonName.."DB", defaults, true)
