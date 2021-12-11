@@ -112,7 +112,7 @@ BigDebuffs.Spells = {
 	[33786] = { type = "immunities" },  -- Cyclone
 	[45334] = { type = "roots", },  -- Feral Charge Effect (Immobilize)
 	[339] = { type = "roots", },  -- Entangling Roots
-	[53313] = { type = "roots", }, -- Entangling Roots (From Nature's Grasp)
+	[19975] = { type = "roots", }, -- Entangling Roots (From Nature's Grasp)
 	[45334] = { type = "interrupts", interruptduration = 4, },  -- Feral Charge Effect (Interrupt)
 	-- Hunter
 	[3045] = { type = "buffs_offensive", }, -- Rapid Fire
