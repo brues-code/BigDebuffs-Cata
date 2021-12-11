@@ -180,20 +180,6 @@ function NPH:OnEnable() -- {{{
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
 
-    local plate;
-    for i, isFriend in ipairs({true,false}) do
-        -- Add nameplates to known healers by GUID
-        for healerGUID, healer in pairs(BigDebuffs.Registry_by_GUID[isFriend]) do
-
-            plate = LNP:GetNameplateByGUID(healerGUID) or LNP:GetNameplateByName(healer.name);
-
-            if plate then
-                self:AddCrossToPlate (plate, isFriend, healer.name);
-            end
-
-        end
-    end
-
 end -- }}}
 
 function NPH:OnDisable() -- {{{
@@ -307,7 +293,7 @@ function NPH:BigDebuffs_HEALER_BORN (selfevent, isFriend, healer)
     if plate then
         -- we have have access to the correct plate through the unit's GUID or it's uniquely named.
         if plateByGuid or not NP_Is_Not_Unique[isFriend][healer.name] then
-            self:AddCrossToPlate (plate, isFriend, healer.name, healer.guid);
+            self:AddCrossToPlate (plate, isFriend, healer.name, healer.guid, healer.icon, healer.start, healer.duration);
 
             self:Debug(INFO, "BigDebuffs_HEALER_BORN(): GUID available or unique", NP_Is_Not_Unique[isFriend][healer.name]);
             self:Debug(WARNING, healer.name, NP_Is_Not_Unique[isFriend][healer.name]);
@@ -315,7 +301,7 @@ function NPH:BigDebuffs_HEALER_BORN (selfevent, isFriend, healer)
         elseif not self.db.global.sPve then -- we can only access through its name and we are not in strict pve mode -- when multi pop, it will add the cross to all plates
 
             for plate, plate in pairs (Multi_Plates_byName[isFriend][healer.name]) do
-                self:AddCrossToPlate (plate, isFriend, healer.name);
+                self:AddCrossToPlate (plate, isFriend, healer.name, nil, healer.icon, healer.start, healer.duration);
 
                 self:Debug(INFO, "BigDebuffs_HEALER_BORN(): Using name only", healer.name);
             end
@@ -411,21 +397,30 @@ do
     local PlateAdditions;
     local PlateName;
     local Guid;
+    local Icon;
+    local Start;
+    local Duration;
 
     local function SetTextureParams(t) -- MUL XXX
         local profile = NPH.db.global;
 
         t:SetSize(64 * profile.marker_Scale, 64 * profile.marker_Scale);
-        t:SetPoint("BOTTOM", Plate, "TOP", 0 + profile.marker_Xoffset, -20 + profile.marker_Yoffset);
+        t:SetPoint("BOTTOM", Plate, "TOP", 0 + profile.marker_Xoffset, 0 + profile.marker_Yoffset);
     end
 
     local function MakeTexture() -- ONCE
-        local t = Plate:CreateTexture();
-
+        local container = CreateFrame("FRAME", Plate)
+        SetTextureParams(container)
+        local t = container:CreateTexture();
         SetTextureParams(t);
 
-        
-        t:SetTexture("Interface\\Addons\\BigDebuffs\\jay.blp");
+        t:SetTexture(Icon);
+        t:SetDrawLayer("BORDER")
+        t.cooldown = CreateFrame("Cooldown", "BD_"..Guid..Icon, container, "CooldownFrameTemplate");
+        t.cooldown:SetCooldown(Start, Duration)
+        t.cooldown:SetAllPoints(container)
+        t.cooldown:SetAlpha(0.9)
+
         --BigDebuffs:RotateTexture(t, 45);
 
         return t;
@@ -479,8 +474,7 @@ do
 
     end
 
-    function NPH:AddCrossToPlate (plate, isFriend, plateName, guid) -- {{{
-
+    function NPH:AddCrossToPlate (plate, isFriend, plateName, guid, icon, start, duration) -- {{{
         if not plate then
             self:Debug(ERROR, "AddCrossToPlate(), plate is not defined");
             return false;
@@ -498,9 +492,12 @@ do
 
         -- export useful data
         IsFriend        = isFriend;
+        Icon            = icon;
         Guid            = guid;
         Plate           = plate;
         PlateName       = plateName;
+        Start           = start;
+        Duration        = duration;
         PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
 
         if not PlateAdditions then
@@ -566,6 +563,7 @@ do
             for plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
 
                 IsFriend        = isFriend;
+                Icon            = icon;
                 Plate           = plate;
                 PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
                 PlateName       = LNP:GetName(plate);

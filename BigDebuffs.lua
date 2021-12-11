@@ -10,7 +10,7 @@ T.BigDebuffs = BigDebuffs
 -- Defaults
 local defaults = {
 	global = {
-		HFT = 60,
+		HFT = 60
 	},
 	profile = {
 		unitFrames = {
@@ -470,6 +470,7 @@ local UnitSetRole               = _G.UnitSetRole;
 local UnitGroupRolesAssigned    = _G.UnitGroupRolesAssigned;
 
 function BigDebuffs:BigDebuffs_HEALER_BORN(selfevent, isFriend, healer)
+
     self:Debug(INFO, "BigDebuffs:BigDebuffs_HEALER_BORN()");
 
     BigDebuffs.Registry_by_GUID[isFriend][healer.guid] = healer;
@@ -836,7 +837,8 @@ end
 
     -- Neatly add them to our little registry and keep an eye on them
     local record, name;
-    local function RegisterHealer (time, isFriend, guid, sourceName, isHuman, spellName, isHealSpell, healDone, configRef) -- {{{
+    local function RegisterHealer (time, unitInfo, configRef) -- {{{
+		local isFriend, guid, sourceName, isHuman, spellName, icon, start, duration = unpack(unitInfo)
 
         -- this is a new one, let's create a birth certificate
         if not Private_registry_by_GUID[isFriend][guid] then
@@ -860,11 +862,12 @@ end
             record = {
                 guid        = guid,
                 name        = name,
+				icon		= icon,
                 fullName    = sourceName,
                 isUnique    = isUnique,
-                isTrueHeal  = false, -- updated later
                 isHuman     = isHuman,
-                healDone    =  0, -- updated later
+				start		= start,
+				duration	= duration,
                 rank        = -1, -- updated later
                 _lastSort   =  0, -- updated later
                 lastMove  =  0, -- updated later
@@ -893,22 +896,14 @@ end
                     name        = name,
                     spells      = {},
                     healDone    = 0,
-                    isTrueHeal  = false,
                     isFriend    = isFriend,
                     isHuman     = isHuman,
+					icon		= icon,
                 };
 
                 BigDebuffs.LOGS[isFriend][guid] = log;
             else
                 log = BigDebuffs.LOGS[isFriend][guid];
-            end
-
-            if isHealSpell then
-                log.healDone = log.healDone + healDone;
-            end
-
-            if not log.isTrueHeal then
-                log.isTrueHeal  = record.isTrueHeal;
             end
 
             if not log.spells[spellName] then
@@ -956,8 +951,7 @@ function BigDebuffs:COMBAT_LOG_EVENT_UNFILTERED(_, ...)
 	end
 
 	if subEvent ~= "SPELL_CAST_SUCCESS" and subEvent ~= "SPELL_INTERRUPT" then
-		print(name)
-		RegisterHealer(GetTime(), false, sourceGUID, sourceName, true, name, true, 9999, {})
+		--RegisterHealer(GetTime(), true, sourceGUID, sourceName, true, name, true, 9999, {})
 		return
 	end
 		
@@ -1180,6 +1174,17 @@ function BigDebuffs:UNIT_AURA(event, unit)
 
 		frame:Show()
 		frame.current = icon
+		local unitInfo = {
+			UnitIsFriend("player",unit) == true,
+			guid,
+			UnitName(unit),
+			UnitIsPlayer(guid), 
+			n,
+			icon,
+			expires - duration,
+			duration
+		}
+		RegisterHealer(now, unitInfo, {})
 	else
 		-- Adapt
 		if frame.anchor and frame.blizzard and Adapt and Adapt.portraits[frame.anchor] then
