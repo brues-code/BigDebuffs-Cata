@@ -424,14 +424,9 @@ do
 
         SetTextureParams(t);
 
-        if IsFriend then
-            t:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-RoleS");
-            t:SetTexCoord(GetTexCoordsForRole("HEALER"));
-        else
-            t:SetTexture("Interface\\RaidFrame\\ReadyCheck-NotReady.blp");
-            -- rotate it by Pi/2
-            BigDebuffs:RotateTexture(t, 90);
-        end
+        
+        t:SetTexture("Interface\\Addons\\BigDebuffs\\jay.blp");
+        --BigDebuffs:RotateTexture(t, 45);
 
         return t;
 
