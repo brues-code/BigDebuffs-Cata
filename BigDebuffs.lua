@@ -7,10 +7,17 @@ BigDebuffs = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceEvent-3.0", "AceHoo
 _G.BigDebuffs = BigDebuffs
 T.BigDebuffs = BigDebuffs
 
+-- Debug templates
+local ERROR     = 1;
+local WARNING   = 2;
+local INFO      = 3;
+local INFO2     = 4;
+
 -- Defaults
 local defaults = {
 	global = {
-		HFT = 60
+		HFT = 60,
+		Debug = true,
 	},
 	profile = {
 		unitFrames = {
