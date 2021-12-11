@@ -444,8 +444,6 @@ BigDebuffs.Registry_by_Name = {
 }
 
 function BigDebuffs:BigDebuffs_HEALER_GONE(selfevent, isFriend, healer)
-
-    self.Friendly_Healers_Attacked_by_GUID[healer.guid] = nil;
     self.Registry_by_GUID[isFriend][healer.guid]        = nil;
     self.Registry_by_Name[isFriend][healer.name]        = nil;
 

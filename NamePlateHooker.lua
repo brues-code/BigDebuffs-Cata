@@ -269,8 +269,8 @@ function NPH:BigDebuffs_HEALER_GONE(selfevent, isFriend, healer)
 end
 
 function NPH:BigDebuffs_HEALER_GROW (selfevent, isFriend, healer)
-    self:Debug(INFO, 'Updating displayed ranks');
-    self:UpdateRanks();
+    --self:Debug(INFO, 'Updating displayed ranks');
+    --self:UpdateRanks();
 end
 
 function NPH:BigDebuffs_HEALER_BORN (selfevent, isFriend, healer)
@@ -409,19 +409,17 @@ do
     end
 
     local function MakeTexture() -- ONCE
-        local container = CreateFrame("FRAME", Plate)
+        local container = CreateFrame("FRAME", Plate:GetName().."container", Plate)
         SetTextureParams(container)
         local t = container:CreateTexture();
         SetTextureParams(t);
 
         t:SetTexture(Icon);
         t:SetDrawLayer("BORDER")
-        t.cooldown = CreateFrame("Cooldown", "BD_"..Guid..Icon, container, "CooldownFrameTemplate");
+        t.cooldown = CreateFrame("Cooldown", container:GetName().."CD", container, "CooldownFrameTemplate");
         t.cooldown:SetCooldown(Start, Duration)
         t.cooldown:SetAllPoints(container)
         t.cooldown:SetAlpha(0.9)
-
-        --BigDebuffs:RotateTexture(t, 45);
 
         return t;
 
@@ -438,14 +436,6 @@ do
         return f;
     end
 
-    local function SetRank ()  -- ONCE
-         if not Guid then
-            PlateAdditions.rankFont:SetText(NP_Is_Not_Unique[IsFriend][PlateName] and '?' or BigDebuffs.Registry_by_Name[IsFriend][PlateName].rank);
-        else
-            PlateAdditions.rankFont:SetText(BigDebuffs.Registry_by_GUID[IsFriend][Guid].rank);
-        end
-    end
-
     local function UpdateTexture () -- MUL XXX
 
         if not PlateAdditions.textureUpdate or PlateAdditions.textureUpdate < LAST_TEXTURE_UPDATE then
@@ -460,15 +450,9 @@ do
 
     local function AddElements () -- ONCEx
         local texture  = MakeTexture();
-        local rankFont = MakeFontString(texture);
 
         PlateAdditions.texture = texture;
         PlateAdditions.texture:Show();
-
-        PlateAdditions.rankFont = rankFont;
-        SetRank();
-       
-        PlateAdditions.rankFont:Show();
 
         PlateAdditions.IsShown = true;
 
@@ -512,14 +496,7 @@ do
 
             UpdateTexture();
             PlateAdditions.texture:Show();
-
-            SetRank();
-
-            PlateAdditions.rankFont:Show();
             PlateAdditions.IsShown = true;
-
-        elseif guid and NP_Is_Not_Unique[IsFriend][plateName] then
-            SetRank();
         end
 
         PlateAdditions.plateName = plateName;
@@ -557,32 +534,6 @@ do
         --@end-alpha@]===]
     end
 
-    function NPH:UpdateRanks ()
-
-        for i, isFriend in ipairs({true,false}) do
-            for plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
-
-                IsFriend        = isFriend;
-                Icon            = icon;
-                Plate           = plate;
-                PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
-                PlateName       = LNP:GetName(plate);
-                Guid            = LNP:GetGUID(plate);
-                Guid            = BigDebuffs.Registry_by_GUID[IsFriend][Guid] and Guid or nil;
-
-                SetRank();
-
-            end
-        end
-
-        --[===[@alpha@
-        IsFriend        = nil;
-        Plate           = nil;
-        PlateName       = nil;
-        PlateAdditions  = nil;
-        --@end-alpha@]===]
-    end
-
 end
 
 function NPH:HideCrossFromPlate(plate, isFriend, plateName) -- {{{
@@ -603,7 +554,7 @@ function NPH:HideCrossFromPlate(plate, isFriend, plateName) -- {{{
         --@end-debug@]===]
 
         plateAdditions.texture:Hide();
-        plateAdditions.rankFont:Hide();
+        plateAdditions.texture.cooldown:Hide();
         plateAdditions.IsShown = false;
 
         plateAdditions.plateName = nil;
