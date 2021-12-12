@@ -302,14 +302,6 @@ BigDebuffs.Spells = {
 	[80483] = { type = "cc", }, -- Arcane Torrent (Focus)
 }
 
-function BigDebuffs_SpellTest()
-	for k,v in pairs(BigDebuffs.Spells) do
-		if not GetSpellInfo(k) then
-			print(k)
-		end
-	end
-end
-
 local units = {
 	"player",
 	"pet",
