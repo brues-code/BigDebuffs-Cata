@@ -1,5 +1,5 @@
-local addonName = ...
-local BigDebuffs = LibStub("AceAddon-3.0"):GetAddon(addonName)
+local addonName, T = ...
+local BigDebuffs = T.BigDebuffs
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local order = {
@@ -14,7 +14,7 @@ local order = {
 local SpellNames = {}
 local SpellIcons = {}
 local Spells = {}
-for spellID, spell in pairs(BigDebuffs.Spells) do
+for spellID, spell in pairs(T.Spells) do
 	if not spell.parent then
 		Spells[spell.type] = Spells[spell.type] or {
 			name = L[spell.type],
@@ -47,7 +47,7 @@ for spellID, spell in pairs(BigDebuffs.Spells) do
 					get = function(info)
 						local name = info[#info]
 						local value = (BigDebuffs.db.profile.spells[spellID] and BigDebuffs.db.profile.spells[spellID][name]) or
-							(not BigDebuffs.Spells[spellID]["no"..name] and 1)
+							(not T.Spells[spellID]["no"..name] and 1)
 						return value and value == 1
 					end,
 					set = function(info, value)
@@ -57,7 +57,7 @@ for spellID, spell in pairs(BigDebuffs.Spells) do
 						BigDebuffs.db.profile.spells[spellID][name] = value
 
 						-- unset if default visibility
-						local no = BigDebuffs.Spells[spellID]["no"..name]
+						local no = T.Spells[spellID]["no"..name]
 						if (value == 1 and not no) or
 							(value == 0 and no) then
 							BigDebuffs.db.profile.spells[spellID][name] = nil

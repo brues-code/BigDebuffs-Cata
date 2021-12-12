@@ -378,10 +378,10 @@ function NPH:LibNameplate_RecycleNameplate(selfevent, plate)
 end
 
 function NPH:LibNameplate_FoundGUID(selfevent, plate, guid, unitID)
-
-    if BigDebuffs.Registry_by_GUID[true][guid] or BigDebuffs.Registry_by_GUID[false][guid] then
+    local unitInfo = BigDebuffs.Registry_by_GUID[true][guid] or BigDebuffs.Registry_by_GUID[false][guid]
+    if unitInfo then
         self:Debug(INFO, "GUID found");
-        self:AddCrossToPlate(plate, nil, LNP:GetName(plate), guid);
+        self:AddCrossToPlate(plate, nil, LNP:GetName(plate), guid, unitInfo.icon, unitInfo.start, unitInfo.duration);
     end
 
 end
@@ -408,18 +408,25 @@ do
         t:SetPoint("BOTTOM", Plate, "TOP", 0 + profile.marker_Xoffset, 0 + profile.marker_Yoffset);
     end
 
+    local function CreateCooldown(t)
+        print(Icon)
+        local container = t:GetParent()
+        t:SetTexture(Icon);
+        t:SetDrawLayer("BORDER")
+        if not t.cooldown then
+            t.cooldown = CreateFrame("Cooldown", container:GetName().."CD", container, "CooldownFrameTemplate");
+        end
+        t.cooldown:SetCooldown(Start, Duration)
+        t.cooldown:SetAllPoints(container)
+        t.cooldown:SetAlpha(0.9)
+    end
+
     local function MakeTexture() -- ONCE
         local container = CreateFrame("FRAME", PlateName.."container", Plate)
         SetTextureParams(container)
         local t = container:CreateTexture();
         SetTextureParams(t);
-
-        t:SetTexture(Icon);
-        t:SetDrawLayer("BORDER")
-        t.cooldown = CreateFrame("Cooldown", container:GetName().."CD", container, "CooldownFrameTemplate");
-        t.cooldown:SetCooldown(Start, Duration)
-        t.cooldown:SetAllPoints(container)
-        t.cooldown:SetAlpha(0.9)
+        CreateCooldown(t);
 
         return t;
 
@@ -442,6 +449,7 @@ do
             --self:Debug('Updating texture');
 
             SetTextureParams(PlateAdditions.texture);
+            CreateCooldown(PlateAdditions.texture)
 
             PlateAdditions.textureUpdate = GetTime();
         end
@@ -489,13 +497,13 @@ do
             plate[PLATES__NPH_NAMES[isFriend]].isFriend = isFriend;
 
             PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
-            print('hi',plateName)
             AddElements();
 
         elseif not PlateAdditions.IsShown then
 
             UpdateTexture();
             PlateAdditions.texture:Show();
+            PlateAdditions.texture.cooldown:Show();
             PlateAdditions.IsShown = true;
         end
 
@@ -554,6 +562,7 @@ function NPH:HideCrossFromPlate(plate, isFriend, plateName) -- {{{
         --@end-debug@]===]
 
         plateAdditions.texture:Hide();
+        plateAdditions.texture.cooldown:SetCooldown(0,0);
         plateAdditions.texture.cooldown:Hide();
         plateAdditions.IsShown = false;
 

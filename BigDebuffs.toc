@@ -12,8 +12,9 @@ embeds.xml
 #@end-no-lib-strip@
 
 locale\locale.xml
+SpellData.lua
 BigDebuffs.xml
-BigDebuffs.lua
+
 utils.lua
 Options.lua
 NamePlateHooker.lua
