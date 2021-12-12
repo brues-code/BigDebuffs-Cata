@@ -35,6 +35,12 @@ local defaults = {
 				size = 50,
 				cdMod = 9,
 			},
+			mouseover = {
+				enabled = true,
+				anchor = "auto",
+				size = 50,
+				cdMod = 9,
+			},
 			target = {
 				enabled = true,
 				anchor = "auto",
